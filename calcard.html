@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>calcard</title>
+
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        
+        <style>
+                .calc_num{
+                        font-size: 15vw;
+                        vertical-align: middle;
+                        touch-action: manipulation;
+                }
+                .calc_op{
+                        font-size: 15vw;
+                        touch-action: manipulation;
+                }
+                .calc_label{
+                        font-size: 5vw;
+                        touch-action: manipulation;
+                }
+                #button{
+                        font-size: 5vw;
+                        width: 40vw;
+                        touch-action: manipulation;
+                }
+        </style>
+
+<script type="text/javascript">
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max);
+}
+
+const url = new URL(document.location);
+const params = new URLSearchParams(url.search);
+
+var state = null;
+
+class SumCalc {
+        constructor(n) {
+                this.sum = n;
+        }
+        reset() {
+                this.x = getRandomInt(this.sum);
+                this.y = '?';
+                this.a = this.sum;
+                this.ux = this.uy = this.ua = true;
+        }
+        solve() {
+                this.y = this.a - this.x;
+                this.uy = true;
+        }
+}
+
+class MaxCalc {
+        constructor(x, y) {
+                this.solved = false;
+                this.max_x = x;
+                this.max_y = y;
+        }
+        reset() {
+                this.x = getRandomInt(this.max_x);
+                this.y = getRandomInt(this.max_y);
+                this.a = '?';
+                this.ux = true;
+                this.uy = true;
+                this.ua = true;
+                this.solved = false;
+        }
+        solve() {
+                this.a = this.x + this.y;
+                this.ua = true;
+                this.solved = true;
+        }
+}
+
+var state;
+var sum, max_x = 10, max_y = 10, s;
+
+if (sum = params.get("sum")) {
+        const n = parseInt(sum);
+        state = new SumCalc(n);
+}
+else {
+        if (s = params.get("max")) {
+                max_x = max_y = parseInt(s);
+        }
+        else {
+                if (s = params.get("max_x")) max_x = parseInt(s);
+                if (s = params.get("max_y")) max_y = parseInt(s);
+        }
+        state = new MaxCalc(max_x, max_y);
+}
+
+function hint_str(n, c) {
+        str = '';
+        for (var i=0; i<n; i++) {if ((i%5) == 0) str += "\n"; str += c;}
+        return str;
+}
+
+function update_expr() {
+        if (state.ux) {
+                document.getElementById("calc_x").textContent = state.x;
+                document.getElementById("hint_x").textContent = hint_str(state.x, '🟥');
+        }
+        if (state.uy) {
+                document.getElementById("calc_y").textContent = state.y;
+                document.getElementById("hint_y").textContent = hint_str(state.y, '🟨');
+        }
+
+        if (state.ua) {
+                document.getElementById("calc_a").textContent = state.a;        
+                document.getElementById("hint_a").textContent = hint_str(state.a, '🟩');
+        }
+}
+
+function setup_calc() {
+        if (!state.solved) {
+                state.reset();
+                update_expr();
+                const btn = document.getElementById("button");
+                btn.innerText = "とけた";
+                state.solved = true;
+
+        }
+        else {
+                state.solve();
+                update_expr();
+
+                const btn = document.getElementById("button");
+                btn.innerText = "つぎのもんだい";
+                state.solved = false;
+        }
+}
+
+window.onload = function() {
+        setup_calc();
+}
+
+</script>
+
+</head>
+<body style="touch-action: manipulation">
+
+<div class="container">
+        <div class="row align-items-end text-right" style="height: 30vh">
+                <div class="col-1"></div>
+                <div class="col-2 calc_num" id='calc_x' >7</div>
+                <div class="col-2 calc_op align-middle">+</div>
+                <div class="col-2 calc_num" id='calc_y' >3</div>
+                <div class="col-2 calc_op">=</div>
+                <div class="col-2 calc_num align-middle" id='calc_a'>10</div>
+                <div class="col-1"></div>
+        </div>
+</div>
+
+<pre class="container">
+        <div class="row align-items-start text-left" style="height: 20vh">
+                <div class="col-1"></div>
+                <div class="col-2" id='hint_x'>hint_x</div>
+                <div class="col-2"></div>
+                <div class="col-2" id="hint_y">hint_y</div>
+                <div class="col-2"></div>
+                <div class="col-2" id='hint_a'>hint_a</div>
+                <div class="col-1"></div>
+        </div>
+</div>
+
+<div class="text-center">
+        <button type="button" class="btn btn-light" id="button" onclick="setup_calc()">solve</button>
+</div>
+
+</body>
+</html>
+
