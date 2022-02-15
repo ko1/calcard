@@ -33,7 +33,7 @@
 <script type="text/javascript">
 
 function getRandomInt(max) {
-  return Math.floor(Math.random() * max);
+  return Math.floor(Math.random() * (max+1));
 }
 
 const url = new URL(document.location);
@@ -79,8 +79,9 @@ class MaxCalc {
         }
 }
 
+var count = 0;
 var state;
-var sum, max_x = 10, max_y = 10, s;
+var sum, max_x = 9, max_y = 9, s;
 
 if (sum = params.get("sum")) {
         const n = parseInt(sum);
@@ -121,6 +122,8 @@ function update_expr() {
 
 function setup_calc() {
         if (!state.solved) {
+                document.getElementById("today_cnt").textContent = ++count;
+
                 state.reset();
                 update_expr();
                 const btn = document.getElementById("button");
@@ -147,6 +150,9 @@ window.onload = function() {
 </head>
 <body style="touch-action: manipulation">
 
+<div class="container text-right">
+<span id='today_cnt'>0</span> かいめ
+</div>
 <div class="container">
         <div class="row align-items-end text-right" style="height: 30vh">
                 <div class="col-1"></div>
