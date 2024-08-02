@@ -41,7 +41,7 @@ const params = new URLSearchParams(url.search);
 
 var state = null;
 
-class SumCalc {
+class SumTotalCalc {
         constructor(n) {
                 this.sum = n;
         }
@@ -55,9 +55,10 @@ class SumCalc {
                 this.y = this.a - this.x;
                 this.uy = true;
         }
+        opchar() { return "+"; }
 }
 
-class MaxCalc {
+class SumMaxCalc {
         constructor(x, y) {
                 this.solved = false;
                 this.max_x = x;
@@ -77,25 +78,116 @@ class MaxCalc {
                 this.ua = true;
                 this.solved = true;
         }
+        opchar() { return "+"; }
+}
+
+class SubTotalCalc {
+        constructor(n) {
+                this.sum = n;
+        }
+        reset() {
+                while (1) {
+                        this.x = getRandomInt(this.sum);
+                        if (this.x >= this.sum) break;
+                }
+                this.y = '?';
+                this.a = this.sum;
+                this.ux = this.uy = this.ua = true;
+        }
+        solve() {
+                this.y = this.x - this.a;
+                this.uy = true;
+        }
+        opchar() { return "-"; }
+}
+
+class SubMaxCalc {
+        constructor(x, y) {
+                this.solved = false;
+                this.max_x = x;
+                this.max_y = y;
+                if (this.max_x < this.max_y) {
+                    this.max_x = this.max_y;
+                }
+        }
+        reset() {
+                this.x = getRandomInt(this.max_x);
+                this.y = getRandomInt(this.max_y);
+                this.a = '?';
+                this.ux = true;
+                this.uy = true;
+                this.ua = true;
+                this.solved = false;
+        }
+        solve() {
+                this.a = this.x - this.y;
+                this.ua = true;
+                this.solved = true;
+        }
+        opchar() { return "-"; }
+}
+
+class MulMaxCalc {
+        constructor(x, y) {
+                this.solved = false;
+                this.max_x = x;
+                this.max_y = y;
+                if (this.max_x < this.max_y) {
+                    this.max_x = this.max_y;
+                }
+        }
+        reset() {
+                this.x = getRandomInt(this.max_x);
+                this.y = getRandomInt(this.max_y);
+                this.a = '?';
+                this.ux = true;
+                this.uy = true;
+                this.ua = true;
+                this.solved = false;
+        }
+        solve() {
+                this.a = this.x * this.y;
+                this.ua = true;
+                this.solved = true;
+        }
+        opchar() { return "×"; }
+}
+
+function get_params_int(name) {
+    const s = params.get(name);
+    var n;
+    if (s) {
+        const n = parseInt(s);
+        if (n > 0) return n;
+    }
 }
 
 var count = 0;
 var state;
-var sum, max_x = 9, max_y = 9, s;
+const mode = params.get("mode") || "sum";
+const total = get_params_int("total");
+const max   = get_params_int("max") || 9;
+const max_x = get_params_int("max_x") || max;
+const max_y = get_params_int("max_y") || max;
 
-if (sum = params.get("sum")) {
-        const n = parseInt(sum);
-        state = new SumCalc(n);
+if (mode == "sum") {
+    if (total) {
+        state = new SumTotalCalc(total);
+    }
+    else {
+        state = new SumMaxCalc(max_x, max_y);
+    }
 }
-else {
-        if (s = params.get("max")) {
-                max_x = max_y = parseInt(s);
-        }
-        else {
-                if (s = params.get("max_x")) max_x = parseInt(s);
-                if (s = params.get("max_y")) max_y = parseInt(s);
-        }
-        state = new MaxCalc(max_x, max_y);
+else if (mode == "sub") {
+    if (total) {
+        state = new SubTotalCalc(total);
+    }
+    else {
+        state = new SubMaxCalc(max_x, max_y);
+    }
+}
+else if (mode == "mul") {
+    state = new MulMaxCalc(max_x, max_y);
 }
 
 function hint_str(n, c) {
@@ -121,6 +213,8 @@ function update_expr() {
 }
 
 function setup_calc() {
+        document.getElementById("calc_op").textContent = state.opchar();
+
         if (!state.solved) {
                 document.getElementById("today_cnt").textContent = ++count;
 
@@ -157,7 +251,7 @@ window.onload = function() {
         <div class="row align-items-end text-right" style="height: 30vh">
                 <div class="col-1"></div>
                 <div class="col-2 calc_num" id='calc_x' >7</div>
-                <div class="col-2 calc_op align-middle">+</div>
+                <div class="col-2 calc_op align-middle" id="calc_op">+</div>
                 <div class="col-2 calc_num" id='calc_y' >3</div>
                 <div class="col-2 calc_op">=</div>
                 <div class="col-2 calc_num align-middle" id='calc_a'>10</div>
