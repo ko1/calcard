@@ -561,8 +561,8 @@
           <div class="mode-icon">🔨</div>
           <div class="mode-name">われるかな？</div>
           <div class="mode-desc">
-            われる数字をぜんぶ見つけよう。<br>
-            見つけたら最後に「もうムリ」！
+            われる数字でどんどんわろう。<br>
+            1 になったらクリア！
           </div>
           <div class="mode-best" id="divideBest">ベストタイム：まだなし</div>
           <span class="mode-start">スタート！</span>
@@ -857,8 +857,24 @@
     });
   }
 
+  function compositeDivisors(v) {
+    const out = [];
+    for (let d = 4; d < v; d++) {
+      if (v % d === 0 && primeFactors(d).length >= 2) out.push(d);
+    }
+    return out;
+  }
+
   function makeButtonValues() {
-    const correct = [...answerFactors];
+    let correct = [...answerFactors];
+
+    // 「われるかな」は素因数だけでなく、合成数の約数もいくつか混ぜる。
+    // 素因数は必ず全部並ぶので、どの順で割っても詰まない。
+    if (mode === "divide") {
+      correct = correct.concat(
+        shuffle(compositeDivisors(originalN)).slice(0, 3)
+      );
+    }
 
     // 最低6個、正解数の2倍を目安にし、タブレットで押しやすいよう最大10個。
     const total = Math.min(10, Math.max(6, correct.length * 2));
@@ -897,11 +913,14 @@
       choicesEl.append(button);
     });
 
-    const giveup = document.createElement("button");
-    giveup.id = "giveup";
-    giveup.textContent = "もうムリ";
-    giveup.addEventListener("click", giveUp);
-    choicesEl.append(giveup);
+    // 「われるかな」は 1 になった時点で自動クリアなので「もうムリ」は不要。
+    if (mode !== "divide") {
+      const giveup = document.createElement("button");
+      giveup.id = "giveup";
+      giveup.textContent = "もうムリ";
+      giveup.addEventListener("click", giveUp);
+      choicesEl.append(giveup);
+    }
   }
 
   function remainingCount(value) {
@@ -913,9 +932,16 @@
   function pressChoice(button, value) {
     if (!gameStarted || locked || button.disabled) return;
 
-    if (remainingCount(value) <= 0) {
+    const ok = mode === "divide"
+      ? n % value === 0
+      : remainingCount(value) > 0;
+
+    if (!ok) {
       animateClass(button, "wrong", 420);
-      showMessage(`${value} はちがうよ`, "bad");
+      showMessage(
+        mode === "divide" ? `${value} では われないよ` : `${value} はちがうよ`,
+        "bad"
+      );
       setTimeout(() => { if (!locked) showMessage(""); }, 650);
       return;
     }
@@ -931,6 +957,10 @@
       equation(`${old} ÷ ${value} = ${n}`);
       renderValue();
       showMessage("せいかい！", "good");
+      if (n === 1) {
+        locked = true;
+        setTimeout(completeRound, 650);
+      }
     } else {
       const oldNum = num;
       const oldDen = den;
@@ -957,24 +987,23 @@
     if (!gameStarted || locked) return;
 
     if (!allCorrectPressed()) {
-      showMessage(
-        mode === "divide"
-          ? "まだ押せる正しい数字があるよ！"
-          : "まだ約分に使える数字があるよ！",
-        "bad"
-      );
+      showMessage("まだ約分に使える数字があるよ！", "bad");
       animateClass(numberEl, "shake", 450);
       setTimeout(() => { if (!locked) showMessage(""); }, 800);
       return;
     }
 
+    completeRound();
+  }
+
+  function completeRound() {
     locked = true;
     choicesEl.querySelectorAll("button").forEach(b => b.disabled = true);
     burst(55);
     animateClass(target, "success-pop", 650);
 
     if (mode === "divide") {
-      equation(`${originalN} = ${answerFactors.join(" × ")}`);
+      equation(`${originalN} = ${pressedFactors.join(" × ")}`);
     } else {
       equation(`${originalNum}/${originalDen} → ${num}/${den}`);
     }
@@ -989,7 +1018,7 @@
       );
       endButtons.classList.add("show");
     } else {
-      showMessage("せいかい！ もうムリ！", "good");
+      showMessage(mode === "divide" ? "1 になった！クリア！" : "せいかい！ もうムリ！", "good");
       setTimeout(() => newRound(false), 650);
     }
   }
@@ -1015,9 +1044,9 @@
   function configureModeUI() {
     if (mode === "divide") {
       gameTitle.textContent = "われるかな？";
-      gameHelp.textContent = "正しい数字をぜんぶ押そう！";
+      gameHelp.textContent = "われる数字を押していこう！";
       promptEl.textContent = "この数字を 1 になるまでわろう";
-      footerEl.textContent = "正しいボタンをぜんぶ押したら「もうムリ」！";
+      footerEl.textContent = "1 になったらクリア！";
       historyLabel.textContent = "おした数字：";
     } else {
       gameTitle.textContent = "なにで約分できるかな？";
