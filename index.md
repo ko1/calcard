@@ -1,5 +1,6 @@
 # CalCard
 
+* [math games](./math_games.html)
 * [sum](./calcard.html?mode=sum)
 * [sub](./calcard.html?mode=sub)
 * [mul](./calcard.html?mode=mul)
