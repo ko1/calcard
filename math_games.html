@@ -1,0 +1,1238 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>われるかな？・なにで約分できるかな？</title>
+<style>
+  :root {
+    --bg1: #fff8dc;
+    --bg2: #e8f7ff;
+    --ink: #243247;
+    --card: rgba(255,255,255,.92);
+    --shadow: 0 12px 30px rgba(35,50,70,.16);
+    --good: #2bb673;
+    --bad: #ef5b5b;
+    --accent: #ff9f1c;
+    --blue: #4c9be8;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    min-height: 100%;
+    font-family:
+      system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+      "Hiragino Sans", "Yu Gothic UI", "Yu Gothic", sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(circle at 20% 15%, #fff7ba 0 8%, transparent 9%),
+      radial-gradient(circle at 82% 12%, #d9f2ff 0 10%, transparent 11%),
+      linear-gradient(150deg, var(--bg1), var(--bg2));
+    overscroll-behavior: none;
+  }
+
+  body {
+    min-height: 100dvh;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+  }
+
+  button { font: inherit; -webkit-tap-highlight-color: transparent; }
+
+  .game {
+    width: min(920px, 100%);
+    min-height: min(760px, calc(100dvh - 32px));
+    display: grid;
+    grid-template-rows: auto auto 1fr auto auto;
+    gap: 14px;
+    background: var(--card);
+    border: 2px solid rgba(255,255,255,.95);
+    border-radius: 28px;
+    box-shadow: var(--shadow);
+    padding: clamp(16px, 3vw, 28px);
+    position: relative;
+    overflow: hidden;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(22px, 4vw, 34px);
+    letter-spacing: .03em;
+  }
+
+  .small { font-size: 14px; opacity: .72; }
+
+  .stats {
+    display: grid;
+    justify-items: end;
+    gap: 3px;
+    flex: 0 0 auto;
+  }
+
+  #round {
+    font-size: clamp(14px, 2.4vw, 18px);
+    font-weight: 800;
+    opacity: .72;
+  }
+
+  #timer {
+    min-width: 7ch;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-size: clamp(24px, 5vw, 38px);
+    line-height: 1;
+    font-weight: 950;
+  }
+
+  #best {
+    min-height: 1.2em;
+    font-size: 13px;
+    font-weight: 700;
+    opacity: .62;
+  }
+
+  .history {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    flex-wrap: wrap;
+    padding: 8px 12px;
+    background: rgba(255,255,255,.65);
+    border-radius: 16px;
+  }
+
+  .history-label { font-weight: 700; opacity: .7; }
+
+  .factor-chip {
+    min-width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    padding: 0 10px;
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(35,50,70,.12);
+    font-weight: 800;
+    animation: chipIn .28s ease-out;
+  }
+
+  .times { font-weight: 900; opacity: .45; }
+
+  .playfield {
+    display: grid;
+    place-items: center;
+    min-height: 320px;
+    position: relative;
+  }
+
+  .target-wrap {
+    display: grid;
+    place-items: center;
+    gap: 10px;
+  }
+
+  .prompt {
+    font-size: clamp(15px, 2.5vw, 20px);
+    font-weight: 700;
+    opacity: .72;
+    text-align: center;
+  }
+
+  #target {
+    width: clamp(180px, 32vw, 290px);
+    aspect-ratio: 1.35 / 1;
+    border-radius: 34px;
+    display: grid;
+    place-items: center;
+    position: relative;
+    background: linear-gradient(180deg, #fff, #f5fbff);
+    border: 5px dashed #6bb9e8;
+    box-shadow:
+      inset 0 0 0 7px rgba(107,185,232,.08),
+      0 14px 28px rgba(36,50,71,.16);
+    transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+  }
+
+  #target.ready {
+    transform: scale(1.055);
+    border-color: var(--accent);
+    box-shadow:
+      inset 0 0 0 9px rgba(255,159,28,.13),
+      0 18px 34px rgba(36,50,71,.2);
+  }
+
+  #number {
+    font-size: clamp(70px, 15vw, 132px);
+    line-height: 1;
+    font-weight: 950;
+    letter-spacing: -.06em;
+    user-select: none;
+  }
+
+  #number.fraction {
+    display: grid;
+    grid-template-rows: auto 6px auto;
+    align-items: center;
+    justify-items: center;
+    gap: 8px;
+    font-size: clamp(44px, 10vw, 82px);
+    letter-spacing: 0;
+    min-width: 1.8em;
+  }
+
+  .frac-line {
+    width: 1.65em;
+    height: 6px;
+    border-radius: 999px;
+    background: currentColor;
+  }
+
+  .message {
+    min-height: 40px;
+    text-align: center;
+    font-size: clamp(18px, 3vw, 26px);
+    font-weight: 900;
+  }
+
+  .message.good { color: var(--good); }
+  .message.bad { color: var(--bad); }
+
+  .choices {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(10px, 2vw, 18px);
+    min-height: 100px;
+  }
+
+  .choices.refresh { animation: choicesRefresh .30s ease-out; }
+
+  .choice {
+    width: clamp(68px, 11vw, 92px);
+    height: clamp(68px, 11vw, 92px);
+    border-radius: 24px;
+    display: grid;
+    place-items: center;
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 950;
+    background: white;
+    color: var(--ink);
+    box-shadow:
+      0 7px 0 #d8e3ec,
+      0 12px 18px rgba(36,50,71,.13);
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    position: relative;
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+
+  .choice:active { cursor: grabbing; }
+  .choice:hover { transform: translateY(-2px); }
+
+  .choice.dragging {
+    position: fixed !important;
+    z-index: 1000;
+    margin: 0;
+    pointer-events: none;
+    transform: scale(1.1) rotate(-4deg);
+    box-shadow: 0 18px 35px rgba(36,50,71,.28);
+    transition: none;
+  }
+
+  #giveup {
+    border: 0;
+    min-height: clamp(68px, 11vw, 92px);
+    padding: 0 clamp(18px, 3vw, 28px);
+    border-radius: 24px;
+    background: #6e7787;
+    color: white;
+    font-weight: 900;
+    font-size: clamp(18px, 3.4vw, 27px);
+    box-shadow:
+      0 7px 0 #4e5663,
+      0 12px 18px rgba(36,50,71,.13);
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  #giveup:active {
+    transform: translateY(4px);
+    box-shadow: 0 3px 0 #4e5663;
+  }
+
+  .footer {
+    text-align: center;
+    font-size: 14px;
+    opacity: .7;
+  }
+
+  .end-buttons {
+    display: none;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .end-buttons.show { display: flex; }
+
+  .end-button {
+    border: 0;
+    padding: 14px 24px;
+    border-radius: 999px;
+    color: white;
+    font-weight: 900;
+    font-size: 19px;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  #retryButton {
+    background: #3b82f6;
+    box-shadow: 0 7px 0 #2767c7;
+  }
+
+  #menuButton {
+    background: #6e7787;
+    box-shadow: 0 7px 0 #4e5663;
+  }
+
+  .shake { animation: shake .42s ease; }
+  .success-pop { animation: successPop .55s cubic-bezier(.2,.9,.25,1.2); }
+  .wrong-flash { animation: wrongFlash .45s ease; }
+  .winner { animation: winner 1s ease-in-out infinite alternate; }
+
+  .burst {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    width: 12px;
+    height: 12px;
+    pointer-events: none;
+    z-index: 2000;
+  }
+
+  .spark {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    background: hsl(var(--h), 88%, 57%);
+    transform: translate(-50%, -50%);
+    animation: fly .85s ease-out forwards;
+  }
+
+  .equation {
+    position: absolute;
+    left: 50%;
+    top: 18%;
+    transform: translateX(-50%);
+    padding: 10px 18px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.96);
+    box-shadow: var(--shadow);
+    font-weight: 950;
+    font-size: clamp(20px, 4vw, 34px);
+    pointer-events: none;
+    animation: eqFloat .9s ease forwards;
+    z-index: 50;
+    white-space: nowrap;
+  }
+
+  /* start / mode selection */
+  .start-screen {
+    position: absolute;
+    inset: 0;
+    z-index: 5000;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background:
+      radial-gradient(circle at 25% 20%, rgba(255,247,186,.95) 0 9%, transparent 10%),
+      radial-gradient(circle at 80% 15%, rgba(217,242,255,.95) 0 11%, transparent 12%),
+      linear-gradient(150deg, #fff8dc, #e8f7ff);
+    transition: opacity .25s ease, visibility .25s ease;
+  }
+
+  .start-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .start-card {
+    width: min(760px, 100%);
+    text-align: center;
+  }
+
+  .start-title {
+    margin: 0 0 8px;
+    font-size: clamp(38px, 8vw, 66px);
+    line-height: 1;
+    font-weight: 950;
+    letter-spacing: -.04em;
+  }
+
+  .start-subtitle {
+    margin: 0 0 24px;
+    font-size: clamp(17px, 3vw, 22px);
+    font-weight: 800;
+    opacity: .7;
+  }
+
+  .mode-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(14px, 3vw, 24px);
+  }
+
+  .mode-card {
+    border: 0;
+    border-radius: 28px;
+    background: rgba(255,255,255,.95);
+    padding: clamp(22px, 4vw, 34px) 18px;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    color: var(--ink);
+    touch-action: manipulation;
+    transition: transform .14s ease, box-shadow .14s ease;
+  }
+
+  .mode-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 36px rgba(35,50,70,.20);
+  }
+
+  .mode-card:active { transform: translateY(2px) scale(.99); }
+
+  .mode-icon {
+    font-size: clamp(46px, 9vw, 72px);
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+
+  .mode-name {
+    font-size: clamp(23px, 4vw, 34px);
+    line-height: 1.25;
+    font-weight: 950;
+    margin-bottom: 10px;
+  }
+
+  .mode-desc {
+    min-height: 3em;
+    font-size: clamp(14px, 2.3vw, 18px);
+    line-height: 1.55;
+    font-weight: 700;
+    opacity: .72;
+  }
+
+  .mode-best {
+    margin-top: 16px;
+    font-size: clamp(14px, 2.3vw, 17px);
+    font-weight: 900;
+    color: #59687a;
+  }
+
+  .mode-start {
+    display: inline-block;
+    margin-top: 16px;
+    padding: 10px 22px;
+    border-radius: 999px;
+    color: white;
+    font-size: clamp(17px, 3vw, 22px);
+    font-weight: 950;
+  }
+
+  #divideMode .mode-start { background: var(--accent); }
+  #reduceMode .mode-start { background: var(--blue); }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    18% { transform: translateX(-12px) rotate(-2deg); }
+    36% { transform: translateX(10px) rotate(2deg); }
+    54% { transform: translateX(-8px); }
+    72% { transform: translateX(6px); }
+  }
+
+  @keyframes successPop {
+    0% { transform: scale(1); }
+    35% { transform: scale(1.18) rotate(-2deg); }
+    70% { transform: scale(.93) rotate(2deg); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes wrongFlash {
+    0%,100% { background: linear-gradient(180deg, #fff, #f5fbff); }
+    45% { background: #ffe4e4; }
+  }
+
+  @keyframes chipIn {
+    from { transform: scale(.4) rotate(-18deg); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  @keyframes choicesRefresh {
+    from { opacity: .25; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes winner {
+    from { transform: scale(1); }
+    to { transform: scale(1.04); }
+  }
+
+  @keyframes fly {
+    from {
+      opacity: 1;
+      transform: translate(-50%, -50%) rotate(0deg) scale(1);
+    }
+    to {
+      opacity: 0;
+      transform:
+        translate(calc(-50% + var(--x)), calc(-50% + var(--y)))
+        rotate(var(--r)) scale(.5);
+    }
+  }
+
+  @keyframes eqFloat {
+    0% { opacity: 0; transform: translate(-50%, 18px) scale(.8); }
+    20% { opacity: 1; transform: translate(-50%, 0) scale(1.08); }
+    70% { opacity: 1; }
+    100% { opacity: 0; transform: translate(-50%, -24px) scale(1); }
+  }
+
+  @media (max-width: 640px) {
+    body { padding: 8px; }
+    .game {
+      min-height: calc(100dvh - 16px);
+      border-radius: 20px;
+      padding: 14px;
+      gap: 10px;
+    }
+    .playfield { min-height: 260px; }
+    .history { min-height: 40px; }
+    .start-screen { padding: 14px; }
+    .mode-grid { grid-template-columns: 1fr; }
+    .mode-desc { min-height: 0; }
+    .mode-card { padding: 18px 16px; }
+    .mode-icon { font-size: 42px; margin-bottom: 7px; }
+    .mode-name { font-size: 25px; margin-bottom: 6px; }
+    .mode-start { margin-top: 10px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+    }
+  }
+</style>
+</head>
+
+<body>
+<main class="game" id="game">
+  <section class="start-screen" id="startScreen">
+    <div class="start-card">
+      <h2 class="start-title">ゲームをえらぼう！</h2>
+      <p class="start-subtitle">どちらも10問タイムアタック</p>
+
+      <div class="mode-grid">
+        <button class="mode-card" id="divideMode">
+          <div class="mode-icon">🔨</div>
+          <div class="mode-name">われるかな？</div>
+          <div class="mode-desc">
+            どの数字ならわれるかな？<br>
+            もうわれないところまで小さくしよう！
+          </div>
+          <div class="mode-best" id="divideBest">ベストタイム：まだなし</div>
+          <span class="mode-start">スタート！</span>
+        </button>
+
+        <button class="mode-card" id="reduceMode">
+          <div class="mode-icon">✂️</div>
+          <div class="mode-name">なにで約分できるかな？</div>
+          <div class="mode-desc">
+            分子と分母を同じ数でわって、<br>
+            これ以上約分できない形にしよう！
+          </div>
+          <div class="mode-best" id="reduceBest">ベストタイム：まだなし</div>
+          <span class="mode-start">スタート！</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <header>
+    <div>
+      <h1 id="gameTitle">われるかな？</h1>
+      <div class="small" id="gameHelp">下の数字を、上の数字にドラッグしよう！</div>
+    </div>
+    <div class="stats">
+      <div id="round"></div>
+      <div id="timer">0.00秒</div>
+      <div id="best"></div>
+    </div>
+  </header>
+
+  <div class="history" id="history">
+    <span class="history-label" id="historyLabel">とった数字：</span>
+    <span id="historyBody">まだなし</span>
+  </div>
+
+  <section class="playfield">
+    <div class="target-wrap">
+      <div class="prompt" id="prompt">この数字をわってみよう</div>
+      <div id="target" aria-label="数字をここにドラッグ">
+        <div id="number">60</div>
+      </div>
+      <div class="message" id="message" aria-live="polite"></div>
+
+      <div class="end-buttons" id="endButtons">
+        <button class="end-button" id="retryButton">もういちど</button>
+        <button class="end-button" id="menuButton">ゲームをえらぶ</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="choices" id="choices"></section>
+
+  <div class="footer" id="footer">
+    われなくなったと思ったら「もうムリ」を押してね
+  </div>
+</main>
+
+<script>
+(() => {
+  const TOTAL_ROUNDS = 10;
+
+  const game = document.querySelector("#game");
+  const startScreen = document.querySelector("#startScreen");
+  const divideModeBtn = document.querySelector("#divideMode");
+  const reduceModeBtn = document.querySelector("#reduceMode");
+  const divideBestEl = document.querySelector("#divideBest");
+  const reduceBestEl = document.querySelector("#reduceBest");
+
+  const gameTitle = document.querySelector("#gameTitle");
+  const gameHelp = document.querySelector("#gameHelp");
+  const promptEl = document.querySelector("#prompt");
+  const footerEl = document.querySelector("#footer");
+  const target = document.querySelector("#target");
+  const numberEl = document.querySelector("#number");
+  const choicesEl = document.querySelector("#choices");
+  const messageEl = document.querySelector("#message");
+  const historyLabel = document.querySelector("#historyLabel");
+  const historyBody = document.querySelector("#historyBody");
+  const roundEl = document.querySelector("#round");
+  const timerEl = document.querySelector("#timer");
+  const bestEl = document.querySelector("#best");
+  const endButtons = document.querySelector("#endButtons");
+  const retryButton = document.querySelector("#retryButton");
+  const menuButton = document.querySelector("#menuButton");
+
+  let mode = null;
+  let round = 1;
+  let locked = false;
+  let gameStarted = false;
+
+  let n = 60;
+  let originalN = 60;
+  let factors = [];
+
+  let num = 18;
+  let den = 24;
+  let originalNum = 18;
+  let originalDen = 24;
+  let reductions = [];
+
+  let timerStarted = false;
+  let timerFinished = false;
+  let startTime = 0;
+  let elapsedMs = 0;
+  let timerFrame = null;
+
+  const divideProblems = [
+    24, 28, 30, 36, 40, 42, 45, 48, 50, 54,
+    56, 60, 63, 66, 70, 72, 75, 80, 84, 90,
+    96, 98, 100, 108, 120, 126, 132, 140, 144, 150
+  ];
+
+  const reduceProblems = [
+    [18,24], [20,30], [24,36], [28,42], [30,45],
+    [32,48], [35,49], [36,54], [40,60], [42,56],
+    [45,60], [48,64], [50,70], [54,72], [56,84],
+    [63,81], [66,88], [70,98], [72,90], [75,100],
+    [84,126], [90,120], [96,144], [105,140], [108,144]
+  ];
+
+  function gcd(a, b) {
+    while (b !== 0) [a, b] = [b, a % b];
+    return Math.abs(a);
+  }
+
+  function isPrime(v) {
+    if (v < 2) return false;
+    if (v % 2 === 0) return v === 2;
+    for (let i = 3; i * i <= v; i += 2) {
+      if (v % i === 0) return false;
+    }
+    return true;
+  }
+
+  function divisors(v) {
+    const out = [];
+    for (let i = 2; i < v; i++) {
+      if (v % i === 0) out.push(i);
+    }
+    return out;
+  }
+
+  function commonDivisors(a, b) {
+    const g = gcd(a, b);
+    const out = [];
+    for (let i = 2; i <= g; i++) {
+      if (g % i === 0) out.push(i);
+    }
+    return out;
+  }
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function formatTime(ms) {
+    return (ms / 1000).toFixed(2) + "秒";
+  }
+
+  function bestKey(m) {
+    return m === "divide" ? "warerukana-best-10" : "yakubun-best-10";
+  }
+
+  function loadBest(m) {
+    try {
+      const value = Number(localStorage.getItem(bestKey(m)));
+      return Number.isFinite(value) && value > 0 ? value : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function refreshBestDisplays() {
+    const d = loadBest("divide");
+    const r = loadBest("reduce");
+    divideBestEl.textContent = d ? `ベストタイム：${formatTime(d)}` : "ベストタイム：まだなし";
+    reduceBestEl.textContent = r ? `ベストタイム：${formatTime(r)}` : "ベストタイム：まだなし";
+
+    if (mode) {
+      const b = loadBest(mode);
+      bestEl.textContent = b ? `ベスト ${formatTime(b)}` : "10問タイムアタック";
+    }
+  }
+
+  function resetTimer() {
+    if (timerFrame) cancelAnimationFrame(timerFrame);
+    timerStarted = false;
+    timerFinished = false;
+    startTime = 0;
+    elapsedMs = 0;
+    timerFrame = null;
+    timerEl.textContent = "0.00秒";
+  }
+
+  function startTimer() {
+    resetTimer();
+    timerStarted = true;
+    startTime = performance.now();
+    tickTimer();
+  }
+
+  function tickTimer() {
+    if (!timerStarted || timerFinished) return;
+    elapsedMs = performance.now() - startTime;
+    timerEl.textContent = formatTime(elapsedMs);
+    timerFrame = requestAnimationFrame(tickTimer);
+  }
+
+  function finishTimer() {
+    elapsedMs = performance.now() - startTime;
+    timerFinished = true;
+    timerStarted = false;
+    if (timerFrame) cancelAnimationFrame(timerFrame);
+    timerEl.textContent = formatTime(elapsedMs);
+
+    const oldBest = loadBest(mode);
+    const isBest = oldBest === null || elapsedMs < oldBest;
+    if (isBest) {
+      try { localStorage.setItem(bestKey(mode), String(elapsedMs)); } catch {}
+    }
+    refreshBestDisplays();
+    return isBest;
+  }
+
+  function showMessage(text, kind = "") {
+    messageEl.className = "message" + (kind ? " " + kind : "");
+    messageEl.textContent = text;
+  }
+
+  function equation(text) {
+    const el = document.createElement("div");
+    el.className = "equation";
+    el.textContent = text;
+    game.append(el);
+    setTimeout(() => el.remove(), 950);
+  }
+
+  function burst(count = 34) {
+    const host = document.createElement("div");
+    host.className = "burst";
+
+    for (let i = 0; i < count; i++) {
+      const s = document.createElement("div");
+      s.className = "spark";
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 80 + Math.random() * 180;
+      s.style.setProperty("--x", Math.cos(angle) * dist + "px");
+      s.style.setProperty("--y", Math.sin(angle) * dist + "px");
+      s.style.setProperty("--r", (Math.random() * 720 - 360) + "deg");
+      s.style.setProperty("--h", Math.floor(Math.random() * 360));
+      host.append(s);
+    }
+
+    target.append(host);
+    setTimeout(() => host.remove(), 900);
+  }
+
+  function animateClass(el, cls, ms) {
+    el.classList.remove(cls);
+    void el.offsetWidth;
+    el.classList.add(cls);
+    setTimeout(() => el.classList.remove(cls), ms);
+  }
+
+  function renderMainValue() {
+    if (mode === "divide") {
+      numberEl.className = "";
+      numberEl.innerHTML = "";
+      numberEl.textContent = n;
+    } else {
+      numberEl.className = "fraction";
+      numberEl.innerHTML = `
+        <span>${num}</span>
+        <span class="frac-line"></span>
+        <span>${den}</span>
+      `;
+    }
+  }
+
+  function renderHistory() {
+    const values = mode === "divide" ? factors : reductions;
+    historyBody.textContent = "";
+
+    if (!values.length) {
+      historyBody.textContent = "まだなし";
+      return;
+    }
+
+    values.forEach((v, i) => {
+      if (i) {
+        const sep = document.createElement("span");
+        sep.className = "times";
+        sep.textContent = mode === "divide" ? "×" : "→";
+        historyBody.append(sep);
+      }
+
+      const chip = document.createElement("span");
+      chip.className = "factor-chip";
+      chip.textContent = mode === "divide" ? v : "÷" + v;
+      historyBody.append(chip);
+    });
+  }
+
+  function makeDivideChoices(v) {
+    const pool = Array.from({length: 11}, (_, i) => i + 2).filter(x => x !== v);
+    let list = shuffle(pool).slice(0, 5);
+
+    if (!isPrime(v)) {
+      const ds = divisors(v).filter(x => x <= 12);
+      const usable = ds.length ? ds : divisors(v);
+      const correct = usable[Math.floor(Math.random() * usable.length)];
+      if (!list.some(x => x < v && v % x === 0)) {
+        list[Math.floor(Math.random() * list.length)] = correct;
+      }
+    }
+
+    list = [...new Set(list)];
+    while (list.length < 5) {
+      const x = 2 + Math.floor(Math.random() * 11);
+      if (!list.includes(x) && x !== v) list.push(x);
+    }
+    return shuffle(list);
+  }
+
+  function makeReduceChoices(a, b) {
+    const pool = Array.from({length: 11}, (_, i) => i + 2);
+    let list = shuffle(pool).slice(0, 5);
+    const ds = commonDivisors(a, b);
+
+    if (ds.length) {
+      const usable = ds.filter(x => x <= 12);
+      const correctPool = usable.length ? usable : ds;
+      const correct = correctPool[Math.floor(Math.random() * correctPool.length)];
+      if (!list.some(x => a % x === 0 && b % x === 0)) {
+        list[Math.floor(Math.random() * list.length)] = correct;
+      }
+    }
+
+    list = [...new Set(list)];
+    while (list.length < 5) {
+      const x = 2 + Math.floor(Math.random() * 11);
+      if (!list.includes(x)) list.push(x);
+    }
+    return shuffle(list);
+  }
+
+  function renderChoices() {
+    choicesEl.innerHTML = "";
+    const list = mode === "divide" ? makeDivideChoices(n) : makeReduceChoices(num, den);
+
+    list.forEach(value => {
+      const el = document.createElement("div");
+      el.className = "choice";
+      el.textContent = value;
+      el.setAttribute("role", "button");
+      el.setAttribute("tabindex", "0");
+      attachDrag(el, value);
+
+      el.addEventListener("keydown", e => {
+        if ((e.key === "Enter" || e.key === " ") && gameStarted && !locked) {
+          e.preventDefault();
+          tryValue(value);
+        }
+      });
+
+      choicesEl.append(el);
+    });
+
+    const giveup = document.createElement("button");
+    giveup.id = "giveup";
+    giveup.textContent = "もうムリ";
+    giveup.addEventListener("click", giveUp);
+    choicesEl.append(giveup);
+  }
+
+  function refreshChoices() {
+    renderChoices();
+    choicesEl.classList.remove("refresh");
+    void choicesEl.offsetWidth;
+    choicesEl.classList.add("refresh");
+  }
+
+  function attachDrag(el, value) {
+    let dragging = false;
+    let pointerId = null;
+    let offsetX = 0;
+    let offsetY = 0;
+    let homeRect = null;
+
+    el.addEventListener("pointerdown", e => {
+      if (locked || !gameStarted) return;
+      dragging = true;
+      pointerId = e.pointerId;
+      homeRect = el.getBoundingClientRect();
+      offsetX = e.clientX - homeRect.left;
+      offsetY = e.clientY - homeRect.top;
+
+      el.setPointerCapture(pointerId);
+      el.style.width = homeRect.width + "px";
+      el.style.height = homeRect.height + "px";
+      el.style.left = homeRect.left + "px";
+      el.style.top = homeRect.top + "px";
+      el.classList.add("dragging");
+      move(e);
+
+      if (navigator.vibrate) navigator.vibrate(10);
+    });
+
+    el.addEventListener("pointermove", e => {
+      if (!dragging || e.pointerId !== pointerId) return;
+      move(e);
+      const r = target.getBoundingClientRect();
+      const inside =
+        e.clientX >= r.left && e.clientX <= r.right &&
+        e.clientY >= r.top && e.clientY <= r.bottom;
+      target.classList.toggle("ready", inside);
+    });
+
+    el.addEventListener("pointerup", e => finish(e, false));
+    el.addEventListener("pointercancel", e => finish(e, true));
+
+    function move(e) {
+      el.style.left = (e.clientX - offsetX) + "px";
+      el.style.top = (e.clientY - offsetY) + "px";
+    }
+
+    function finish(e, cancelled) {
+      if (!dragging || e.pointerId !== pointerId) return;
+      dragging = false;
+      target.classList.remove("ready");
+
+      const r = target.getBoundingClientRect();
+      const dropped =
+        !cancelled &&
+        e.clientX >= r.left && e.clientX <= r.right &&
+        e.clientY >= r.top && e.clientY <= r.bottom;
+
+      el.classList.remove("dragging");
+      el.style.cssText = "";
+
+      if (dropped) tryValue(value);
+    }
+  }
+
+  function tryValue(x) {
+    if (locked || !gameStarted) return;
+
+    if (mode === "divide") {
+      if (x < n && n % x === 0) {
+        locked = true;
+
+        const old = n;
+        const next = n / x;
+        n = next;
+        factors.push(x);
+
+        renderHistory();
+
+        // 古い候補を誤って押せないよう、下を先に更新する。
+        refreshChoices();
+        showMessage("やった！ われた！", "good");
+
+        setTimeout(() => {
+          equation(`${old} ÷ ${x} = ${next}`);
+          renderMainValue();
+          burst();
+          animateClass(target, "success-pop", 600);
+        }, 120);
+
+        setTimeout(() => {
+          showMessage("");
+          locked = false;
+        }, 520);
+      } else {
+        equation(`${n} ÷ ${x} … われない！`);
+        showMessage(`${x} では われないよ`, "bad");
+        animateClass(target, "wrong-flash", 500);
+        animateClass(numberEl, "shake", 500);
+        setTimeout(() => { if (!locked) showMessage(""); }, 800);
+      }
+    } else {
+      if (num % x === 0 && den % x === 0) {
+        locked = true;
+
+        const oldNum = num;
+        const oldDen = den;
+        num /= x;
+        den /= x;
+        reductions.push(x);
+
+        renderHistory();
+
+        // 約分ゲームでも候補を先に更新する。
+        refreshChoices();
+        showMessage("やった！ 約分できた！", "good");
+
+        setTimeout(() => {
+          equation(`${oldNum}/${oldDen} ÷ ${x} = ${num}/${den}`);
+          renderMainValue();
+          burst();
+          animateClass(target, "success-pop", 600);
+        }, 120);
+
+        setTimeout(() => {
+          showMessage("");
+          locked = false;
+        }, 520);
+      } else {
+        equation(`${x} では両方われない！`);
+        showMessage(`${x} では約分できないよ`, "bad");
+        animateClass(target, "wrong-flash", 500);
+        animateClass(numberEl, "shake", 500);
+        setTimeout(() => { if (!locked) showMessage(""); }, 800);
+      }
+    }
+  }
+
+  function giveUp() {
+    if (locked || !gameStarted) return;
+
+    const finished =
+      mode === "divide"
+        ? isPrime(n)
+        : gcd(num, den) === 1;
+
+    if (!finished) {
+      showMessage(
+        mode === "divide"
+          ? "まだわれるよ！ もういちど探してみよう"
+          : "まだ約分できるよ！ もういちど探してみよう",
+        "bad"
+      );
+      animateClass(numberEl, "shake", 500);
+      setTimeout(() => {
+        if (!locked) {
+          showMessage("");
+          refreshChoices();
+        }
+      }, 900);
+      return;
+    }
+
+    locked = true;
+    choicesEl.innerHTML = "";
+    burst(70);
+    animateClass(target, "success-pop", 700);
+
+    if (mode === "divide") {
+      factors.push(n);
+      renderHistory();
+      equation(`${originalN} = ${factors.join(" × ")}`);
+    } else {
+      equation(`${originalNum}/${originalDen} → ${num}/${den}`);
+    }
+
+    if (round >= TOTAL_ROUNDS) {
+      const isBest = finishTimer();
+      gameStarted = false;
+      target.classList.add("winner");
+      showMessage(
+        `10問クリア！ ${formatTime(elapsedMs)}${isBest ? "　★ベスト！" : ""}`,
+        "good"
+      );
+      endButtons.classList.add("show");
+    } else {
+      showMessage(
+        mode === "divide"
+          ? `せいかい！ ${n} はこれ以上われない！`
+          : `せいかい！ ${num}/${den} はもう約分できない！`,
+        "good"
+      );
+      setTimeout(() => newRound(false), 700);
+    }
+  }
+
+  function pickDivideProblem(first) {
+    if (first) return 60;
+    let next;
+    do {
+      next = divideProblems[Math.floor(Math.random() * divideProblems.length)];
+    } while (next === originalN);
+    return next;
+  }
+
+  function pickReduceProblem(first) {
+    if (first) return [18, 24];
+    let p;
+    do {
+      p = reduceProblems[Math.floor(Math.random() * reduceProblems.length)];
+    } while (p[0] === originalNum && p[1] === originalDen);
+    return p;
+  }
+
+  function configureModeUI() {
+    if (mode === "divide") {
+      gameTitle.textContent = "われるかな？";
+      gameHelp.textContent = "下の数字を、上の数字にドラッグしよう！";
+      promptEl.textContent = "この数字をわってみよう";
+      footerEl.textContent = "われなくなったと思ったら「もうムリ」を押してね";
+      historyLabel.textContent = "とった数字：";
+    } else {
+      gameTitle.textContent = "なにで約分できるかな？";
+      gameHelp.textContent = "下の数字を、分数にドラッグしよう！";
+      promptEl.textContent = "分子と分母を、同じ数でわってみよう";
+      footerEl.textContent = "もう約分できないと思ったら「もうムリ」を押してね";
+      historyLabel.textContent = "約分した数：";
+    }
+    refreshBestDisplays();
+  }
+
+  function newRound(first = false) {
+    locked = false;
+    target.classList.remove("winner");
+    endButtons.classList.remove("show");
+
+    if (first) round = 1;
+    else round++;
+
+    if (mode === "divide") {
+      factors = [];
+      originalN = pickDivideProblem(first);
+      n = originalN;
+    } else {
+      reductions = [];
+      [originalNum, originalDen] = pickReduceProblem(first);
+      num = originalNum;
+      den = originalDen;
+    }
+
+    roundEl.textContent = `${round} / ${TOTAL_ROUNDS} 問`;
+    showMessage("");
+    renderMainValue();
+    renderHistory();
+    renderChoices();
+  }
+
+  function startGame(selectedMode) {
+    mode = selectedMode;
+    gameStarted = true;
+    configureModeUI();
+    newRound(true);
+    startScreen.classList.add("hidden");
+    startTimer();
+  }
+
+  function showMenu() {
+    gameStarted = false;
+    locked = false;
+    mode = null;
+    resetTimer();
+    showMessage("");
+    endButtons.classList.remove("show");
+    target.classList.remove("winner");
+    refreshBestDisplays();
+    startScreen.classList.remove("hidden");
+  }
+
+  divideModeBtn.addEventListener("click", () => startGame("divide"));
+  reduceModeBtn.addEventListener("click", () => startGame("reduce"));
+
+  retryButton.addEventListener("click", () => {
+    const selected = mode;
+    gameStarted = true;
+    configureModeUI();
+    newRound(true);
+    startTimer();
+  });
+
+  menuButton.addEventListener("click", showMenu);
+
+  refreshBestDisplays();
+  showMenu();
+})();
+</script>
+</body>
+</html>
