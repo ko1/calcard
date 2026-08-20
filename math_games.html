@@ -6,15 +6,12 @@
 <title>われるかな？・なにで約分できるかな？</title>
 <style>
   :root {
-    --bg1: #fff8dc;
-    --bg2: #e8f7ff;
     --ink: #243247;
-    --card: rgba(255,255,255,.92);
-    --shadow: 0 12px 30px rgba(35,50,70,.16);
     --good: #2bb673;
     --bad: #ef5b5b;
-    --accent: #ff9f1c;
+    --orange: #ff9f1c;
     --blue: #4c9be8;
+    --shadow: 0 12px 30px rgba(35,50,70,.16);
   }
 
   * { box-sizing: border-box; }
@@ -27,9 +24,9 @@
       "Hiragino Sans", "Yu Gothic UI", "Yu Gothic", sans-serif;
     color: var(--ink);
     background:
-      radial-gradient(circle at 20% 15%, #fff7ba 0 8%, transparent 9%),
-      radial-gradient(circle at 82% 12%, #d9f2ff 0 10%, transparent 11%),
-      linear-gradient(150deg, var(--bg1), var(--bg2));
+      radial-gradient(circle at 18% 14%, #fff4aa 0 8%, transparent 9%),
+      radial-gradient(circle at 84% 13%, #d9f2ff 0 10%, transparent 11%),
+      linear-gradient(150deg, #fff8dc, #e8f7ff);
     overscroll-behavior: none;
   }
 
@@ -37,50 +34,53 @@
     min-height: 100dvh;
     display: grid;
     place-items: center;
-    padding: 16px;
+    padding: 14px;
   }
 
-  button { font: inherit; -webkit-tap-highlight-color: transparent; }
+  button {
+    font: inherit;
+    -webkit-tap-highlight-color: transparent;
+  }
 
   .game {
-    width: min(920px, 100%);
-    min-height: min(760px, calc(100dvh - 32px));
+    width: min(940px, 100%);
+    min-height: min(760px, calc(100dvh - 28px));
     display: grid;
     grid-template-rows: auto auto 1fr auto auto;
     gap: 14px;
-    background: var(--card);
-    border: 2px solid rgba(255,255,255,.95);
-    border-radius: 28px;
-    box-shadow: var(--shadow);
     padding: clamp(16px, 3vw, 28px);
     position: relative;
     overflow: hidden;
+    border-radius: 28px;
+    background: rgba(255,255,255,.9);
+    box-shadow: var(--shadow);
   }
 
   header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
+    gap: 14px;
   }
 
   h1 {
     margin: 0;
     font-size: clamp(22px, 4vw, 34px);
-    letter-spacing: .03em;
   }
 
-  .small { font-size: 14px; opacity: .72; }
+  .small {
+    font-size: 14px;
+    opacity: .7;
+  }
 
   .stats {
     display: grid;
     justify-items: end;
     gap: 3px;
-    flex: 0 0 auto;
   }
 
   #round {
-    font-size: clamp(14px, 2.4vw, 18px);
+    font-size: clamp(14px, 2.3vw, 18px);
     font-weight: 800;
     opacity: .72;
   }
@@ -88,10 +88,10 @@
   #timer {
     min-width: 7ch;
     text-align: right;
-    font-variant-numeric: tabular-nums;
     font-size: clamp(24px, 5vw, 38px);
-    line-height: 1;
     font-weight: 950;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
   }
 
   #best {
@@ -102,37 +102,43 @@
   }
 
   .history {
-    min-height: 44px;
+    min-height: 46px;
     display: flex;
     align-items: center;
-    gap: 9px;
+    gap: 8px;
     flex-wrap: wrap;
     padding: 8px 12px;
-    background: rgba(255,255,255,.65);
     border-radius: 16px;
+    background: rgba(255,255,255,.68);
   }
 
-  .history-label { font-weight: 700; opacity: .7; }
+  .history-label {
+    font-weight: 800;
+    opacity: .7;
+  }
 
-  .factor-chip {
+  .history-chip {
     min-width: 38px;
     height: 38px;
+    padding: 0 10px;
     display: grid;
     place-items: center;
-    padding: 0 10px;
     border-radius: 999px;
-    background: #fff;
+    background: white;
     box-shadow: 0 4px 12px rgba(35,50,70,.12);
-    font-weight: 800;
-    animation: chipIn .28s ease-out;
+    font-weight: 900;
+    animation: chipIn .24s ease-out;
   }
 
-  .times { font-weight: 900; opacity: .45; }
+  .sep {
+    font-weight: 950;
+    opacity: .45;
+  }
 
   .playfield {
     display: grid;
     place-items: center;
-    min-height: 320px;
+    min-height: 310px;
     position: relative;
   }
 
@@ -143,37 +149,28 @@
   }
 
   .prompt {
-    font-size: clamp(15px, 2.5vw, 20px);
-    font-weight: 700;
-    opacity: .72;
     text-align: center;
+    font-size: clamp(16px, 2.6vw, 21px);
+    font-weight: 800;
+    opacity: .72;
   }
 
   #target {
-    width: clamp(180px, 32vw, 290px);
+    width: clamp(190px, 32vw, 300px);
     aspect-ratio: 1.35 / 1;
-    border-radius: 34px;
     display: grid;
     place-items: center;
     position: relative;
+    border: 5px solid #8bc8eb;
+    border-radius: 34px;
     background: linear-gradient(180deg, #fff, #f5fbff);
-    border: 5px dashed #6bb9e8;
     box-shadow:
       inset 0 0 0 7px rgba(107,185,232,.08),
       0 14px 28px rgba(36,50,71,.16);
-    transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
-  }
-
-  #target.ready {
-    transform: scale(1.055);
-    border-color: var(--accent);
-    box-shadow:
-      inset 0 0 0 9px rgba(255,159,28,.13),
-      0 18px 34px rgba(36,50,71,.2);
   }
 
   #number {
-    font-size: clamp(70px, 15vw, 132px);
+    font-size: clamp(72px, 15vw, 132px);
     line-height: 1;
     font-weight: 950;
     letter-spacing: -.06em;
@@ -181,6 +178,7 @@
   }
 
   #number.fraction {
+    min-width: 1.8em;
     display: grid;
     grid-template-rows: auto 6px auto;
     align-items: center;
@@ -188,7 +186,6 @@
     gap: 8px;
     font-size: clamp(44px, 10vw, 82px);
     letter-spacing: 0;
-    min-width: 1.8em;
   }
 
   .frac-line {
@@ -202,74 +199,99 @@
     min-height: 40px;
     text-align: center;
     font-size: clamp(18px, 3vw, 26px);
-    font-weight: 900;
+    font-weight: 950;
   }
 
   .message.good { color: var(--good); }
   .message.bad { color: var(--bad); }
 
   .choices {
+    min-height: 108px;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: clamp(10px, 2vw, 18px);
-    min-height: 100px;
+    gap: clamp(10px, 2vw, 16px);
   }
-
-  .choices.refresh { animation: choicesRefresh .30s ease-out; }
 
   .choice {
-    width: clamp(68px, 11vw, 92px);
-    height: clamp(68px, 11vw, 92px);
-    border-radius: 24px;
+    width: clamp(68px, 10.5vw, 92px);
+    height: clamp(68px, 10.5vw, 92px);
+    border: 0;
+    border-radius: 23px;
     display: grid;
     place-items: center;
-    font-size: clamp(28px, 5vw, 42px);
-    font-weight: 950;
+    position: relative;
     background: white;
     color: var(--ink);
-    box-shadow:
-      0 7px 0 #d8e3ec,
-      0 12px 18px rgba(36,50,71,.13);
-    cursor: grab;
-    touch-action: none;
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 950;
+    cursor: pointer;
     user-select: none;
-    position: relative;
-    transition: transform .12s ease, box-shadow .12s ease;
+    touch-action: manipulation;
+    box-shadow:
+      0 8px 0 #d6e0e8,
+      0 12px 18px rgba(36,50,71,.13);
+    transition:
+      transform .12s ease,
+      box-shadow .12s ease,
+      background .12s ease,
+      color .12s ease,
+      opacity .12s ease;
   }
 
-  .choice:active { cursor: grabbing; }
-  .choice:hover { transform: translateY(-2px); }
+  .choice:hover:not(:disabled) {
+    transform: translateY(-2px);
+  }
 
-  .choice.dragging {
-    position: fixed !important;
-    z-index: 1000;
-    margin: 0;
-    pointer-events: none;
-    transform: scale(1.1) rotate(-4deg);
-    box-shadow: 0 18px 35px rgba(36,50,71,.28);
-    transition: none;
+  .choice:active:not(:disabled) {
+    transform: translateY(5px);
+    box-shadow:
+      0 3px 0 #d6e0e8,
+      0 7px 12px rgba(36,50,71,.11);
+  }
+
+  .choice.used {
+    background: #dff7ea;
+    color: #148452;
+    transform: translateY(6px);
+    box-shadow:
+      0 2px 0 #9fd6b9,
+      inset 0 2px 6px rgba(30,100,70,.08);
+    cursor: default;
+  }
+
+  .choice.used::after {
+    content: "✓";
+    position: absolute;
+    right: 7px;
+    top: 4px;
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  .choice.wrong {
+    animation: buttonWrong .38s ease;
   }
 
   #giveup {
-    border: 0;
-    min-height: clamp(68px, 11vw, 92px);
+    min-height: clamp(68px, 10.5vw, 92px);
     padding: 0 clamp(18px, 3vw, 28px);
-    border-radius: 24px;
+    border: 0;
+    border-radius: 23px;
     background: #6e7787;
     color: white;
-    font-weight: 900;
     font-size: clamp(18px, 3.4vw, 27px);
-    box-shadow:
-      0 7px 0 #4e5663,
-      0 12px 18px rgba(36,50,71,.13);
+    font-weight: 950;
     cursor: pointer;
     touch-action: manipulation;
+    box-shadow:
+      0 8px 0 #4e5663,
+      0 12px 18px rgba(36,50,71,.13);
   }
 
   #giveup:active {
-    transform: translateY(4px);
+    transform: translateY(5px);
     box-shadow: 0 3px 0 #4e5663;
   }
 
@@ -281,8 +303,8 @@
 
   .end-buttons {
     display: none;
-    gap: 12px;
     justify-content: center;
+    gap: 12px;
     flex-wrap: wrap;
   }
 
@@ -293,10 +315,9 @@
     padding: 14px 24px;
     border-radius: 999px;
     color: white;
-    font-weight: 900;
+    font-weight: 950;
     font-size: 19px;
     cursor: pointer;
-    touch-action: manipulation;
   }
 
   #retryButton {
@@ -309,18 +330,17 @@
     box-shadow: 0 7px 0 #4e5663;
   }
 
-  .shake { animation: shake .42s ease; }
-  .success-pop { animation: successPop .55s cubic-bezier(.2,.9,.25,1.2); }
-  .wrong-flash { animation: wrongFlash .45s ease; }
+  .success-pop { animation: successPop .5s cubic-bezier(.2,.9,.25,1.2); }
+  .shake { animation: shake .4s ease; }
   .winner { animation: winner 1s ease-in-out infinite alternate; }
 
   .burst {
     position: absolute;
-    inset: 50% auto auto 50%;
-    width: 12px;
-    height: 12px;
+    left: 50%;
+    top: 50%;
+    width: 8px;
+    height: 8px;
     pointer-events: none;
-    z-index: 2000;
   }
 
   .spark {
@@ -329,35 +349,33 @@
     height: 12px;
     border-radius: 3px;
     background: hsl(var(--h), 88%, 57%);
-    transform: translate(-50%, -50%);
-    animation: fly .85s ease-out forwards;
+    animation: fly .8s ease-out forwards;
   }
 
   .equation {
     position: absolute;
     left: 50%;
-    top: 18%;
+    top: 16%;
     transform: translateX(-50%);
-    padding: 10px 18px;
+    z-index: 100;
+    padding: 9px 16px;
     border-radius: 999px;
-    background: rgba(255,255,255,.96);
+    background: rgba(255,255,255,.97);
     box-shadow: var(--shadow);
+    font-size: clamp(19px, 3.6vw, 31px);
     font-weight: 950;
-    font-size: clamp(20px, 4vw, 34px);
-    pointer-events: none;
-    animation: eqFloat .9s ease forwards;
-    z-index: 50;
     white-space: nowrap;
+    pointer-events: none;
+    animation: eqFloat .8s ease forwards;
   }
 
-  /* start / mode selection */
   .start-screen {
     position: absolute;
     inset: 0;
     z-index: 5000;
     display: grid;
     place-items: center;
-    padding: 24px;
+    padding: 22px;
     background:
       radial-gradient(circle at 25% 20%, rgba(255,247,186,.95) 0 9%, transparent 10%),
       radial-gradient(circle at 80% 15%, rgba(217,242,255,.95) 0 11%, transparent 12%),
@@ -381,7 +399,6 @@
     font-size: clamp(38px, 8vw, 66px);
     line-height: 1;
     font-weight: 950;
-    letter-spacing: -.04em;
   }
 
   .start-subtitle {
@@ -400,11 +417,11 @@
   .mode-card {
     border: 0;
     border-radius: 28px;
-    background: rgba(255,255,255,.95);
+    background: rgba(255,255,255,.96);
     padding: clamp(22px, 4vw, 34px) 18px;
     box-shadow: var(--shadow);
-    cursor: pointer;
     color: var(--ink);
+    cursor: pointer;
     touch-action: manipulation;
     transition: transform .14s ease, box-shadow .14s ease;
   }
@@ -414,19 +431,17 @@
     box-shadow: 0 18px 36px rgba(35,50,70,.20);
   }
 
-  .mode-card:active { transform: translateY(2px) scale(.99); }
-
   .mode-icon {
-    font-size: clamp(46px, 9vw, 72px);
+    font-size: clamp(44px, 8vw, 68px);
     line-height: 1;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
 
   .mode-name {
+    margin-bottom: 10px;
     font-size: clamp(23px, 4vw, 34px);
     line-height: 1.25;
     font-weight: 950;
-    margin-bottom: 10px;
   }
 
   .mode-desc {
@@ -438,15 +453,15 @@
   }
 
   .mode-best {
-    margin-top: 16px;
-    font-size: clamp(14px, 2.3vw, 17px);
+    margin-top: 15px;
+    font-size: clamp(14px, 2.2vw, 17px);
     font-weight: 900;
     color: #59687a;
   }
 
   .mode-start {
     display: inline-block;
-    margin-top: 16px;
+    margin-top: 15px;
     padding: 10px 22px;
     border-radius: 999px;
     color: white;
@@ -454,37 +469,33 @@
     font-weight: 950;
   }
 
-  #divideMode .mode-start { background: var(--accent); }
+  #divideMode .mode-start { background: var(--orange); }
   #reduceMode .mode-start { background: var(--blue); }
 
-  @keyframes shake {
-    0%,100% { transform: translateX(0); }
-    18% { transform: translateX(-12px) rotate(-2deg); }
-    36% { transform: translateX(10px) rotate(2deg); }
-    54% { transform: translateX(-8px); }
-    72% { transform: translateX(6px); }
+  @keyframes chipIn {
+    from { opacity: 0; transform: scale(.5); }
+    to { opacity: 1; transform: scale(1); }
   }
 
   @keyframes successPop {
     0% { transform: scale(1); }
-    35% { transform: scale(1.18) rotate(-2deg); }
-    70% { transform: scale(.93) rotate(2deg); }
+    40% { transform: scale(1.16) rotate(-2deg); }
+    75% { transform: scale(.95) rotate(1deg); }
     100% { transform: scale(1); }
   }
 
-  @keyframes wrongFlash {
-    0%,100% { background: linear-gradient(180deg, #fff, #f5fbff); }
-    45% { background: #ffe4e4; }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-11px); }
+    40% { transform: translateX(9px); }
+    60% { transform: translateX(-7px); }
+    80% { transform: translateX(5px); }
   }
 
-  @keyframes chipIn {
-    from { transform: scale(.4) rotate(-18deg); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-  }
-
-  @keyframes choicesRefresh {
-    from { opacity: .25; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
+  @keyframes buttonWrong {
+    0%,100% { background: white; transform: translateX(0); }
+    30% { background: #ffe1e1; transform: translateX(-7px); }
+    60% { background: #ffe1e1; transform: translateX(7px); }
   }
 
   @keyframes winner {
@@ -495,7 +506,7 @@
   @keyframes fly {
     from {
       opacity: 1;
-      transform: translate(-50%, -50%) rotate(0deg) scale(1);
+      transform: translate(-50%, -50%) rotate(0deg);
     }
     to {
       opacity: 0;
@@ -506,29 +517,27 @@
   }
 
   @keyframes eqFloat {
-    0% { opacity: 0; transform: translate(-50%, 18px) scale(.8); }
-    20% { opacity: 1; transform: translate(-50%, 0) scale(1.08); }
+    0% { opacity: 0; transform: translate(-50%, 15px) scale(.85); }
+    20% { opacity: 1; transform: translate(-50%, 0) scale(1.06); }
     70% { opacity: 1; }
-    100% { opacity: 0; transform: translate(-50%, -24px) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -20px); }
   }
 
   @media (max-width: 640px) {
-    body { padding: 8px; }
+    body { padding: 7px; }
     .game {
-      min-height: calc(100dvh - 16px);
-      border-radius: 20px;
-      padding: 14px;
+      min-height: calc(100dvh - 14px);
+      padding: 13px;
       gap: 10px;
+      border-radius: 20px;
     }
-    .playfield { min-height: 260px; }
-    .history { min-height: 40px; }
-    .start-screen { padding: 14px; }
+    .playfield { min-height: 255px; }
     .mode-grid { grid-template-columns: 1fr; }
+    .mode-card { padding: 18px 15px; }
+    .mode-icon { font-size: 40px; margin-bottom: 6px; }
+    .mode-name { font-size: 24px; margin-bottom: 5px; }
     .mode-desc { min-height: 0; }
-    .mode-card { padding: 18px 16px; }
-    .mode-icon { font-size: 42px; margin-bottom: 7px; }
-    .mode-name { font-size: 25px; margin-bottom: 6px; }
-    .mode-start { margin-top: 10px; }
+    .mode-start { margin-top: 9px; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -552,8 +561,8 @@
           <div class="mode-icon">🔨</div>
           <div class="mode-name">われるかな？</div>
           <div class="mode-desc">
-            どの数字ならわれるかな？<br>
-            もうわれないところまで小さくしよう！
+            われる数字をぜんぶ見つけよう。<br>
+            見つけたら最後に「もうムリ」！
           </div>
           <div class="mode-best" id="divideBest">ベストタイム：まだなし</div>
           <span class="mode-start">スタート！</span>
@@ -563,8 +572,8 @@
           <div class="mode-icon">✂️</div>
           <div class="mode-name">なにで約分できるかな？</div>
           <div class="mode-desc">
-            分子と分母を同じ数でわって、<br>
-            これ以上約分できない形にしよう！
+            約分に使える数字をぜんぶ見つけよう。<br>
+            見つけたら最後に「もうムリ」！
           </div>
           <div class="mode-best" id="reduceBest">ベストタイム：まだなし</div>
           <span class="mode-start">スタート！</span>
@@ -576,7 +585,7 @@
   <header>
     <div>
       <h1 id="gameTitle">われるかな？</h1>
-      <div class="small" id="gameHelp">下の数字を、上の数字にドラッグしよう！</div>
+      <div class="small" id="gameHelp">正しい数字をぜんぶ押そう！</div>
     </div>
     <div class="stats">
       <div id="round"></div>
@@ -585,15 +594,15 @@
     </div>
   </header>
 
-  <div class="history" id="history">
-    <span class="history-label" id="historyLabel">とった数字：</span>
+  <div class="history">
+    <span class="history-label" id="historyLabel">おした数字：</span>
     <span id="historyBody">まだなし</span>
   </div>
 
   <section class="playfield">
     <div class="target-wrap">
-      <div class="prompt" id="prompt">この数字をわってみよう</div>
-      <div id="target" aria-label="数字をここにドラッグ">
+      <div class="prompt" id="prompt"></div>
+      <div id="target">
         <div id="number">60</div>
       </div>
       <div class="message" id="message" aria-live="polite"></div>
@@ -607,14 +616,13 @@
 
   <section class="choices" id="choices"></section>
 
-  <div class="footer" id="footer">
-    われなくなったと思ったら「もうムリ」を押してね
-  </div>
+  <div class="footer" id="footer"></div>
 </main>
 
 <script>
 (() => {
   const TOTAL_ROUNDS = 10;
+  const DECOY_POOL = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 20];
 
   const game = document.querySelector("#game");
   const startScreen = document.querySelector("#startScreen");
@@ -642,18 +650,19 @@
 
   let mode = null;
   let round = 1;
-  let locked = false;
   let gameStarted = false;
+  let locked = false;
 
-  let n = 60;
   let originalN = 60;
-  let factors = [];
+  let n = 60;
 
-  let num = 18;
-  let den = 24;
   let originalNum = 18;
   let originalDen = 24;
-  let reductions = [];
+  let num = 18;
+  let den = 24;
+
+  let answerFactors = [];
+  let pressedFactors = [];
 
   let timerStarted = false;
   let timerFinished = false;
@@ -680,29 +689,16 @@
     return Math.abs(a);
   }
 
-  function isPrime(v) {
-    if (v < 2) return false;
-    if (v % 2 === 0) return v === 2;
-    for (let i = 3; i * i <= v; i += 2) {
-      if (v % i === 0) return false;
-    }
-    return true;
-  }
-
-  function divisors(v) {
+  function primeFactors(v) {
     const out = [];
-    for (let i = 2; i < v; i++) {
-      if (v % i === 0) out.push(i);
+    let x = v;
+    for (let p = 2; p * p <= x; p++) {
+      while (x % p === 0) {
+        out.push(p);
+        x /= p;
+      }
     }
-    return out;
-  }
-
-  function commonDivisors(a, b) {
-    const g = gcd(a, b);
-    const out = [];
-    for (let i = 2; i <= g; i++) {
-      if (g % i === 0) out.push(i);
-    }
+    if (x > 1) out.push(x);
     return out;
   }
 
@@ -720,13 +716,13 @@
   }
 
   function bestKey(m) {
-    return m === "divide" ? "warerukana-best-10" : "yakubun-best-10";
+    return m === "divide" ? "warerukana-click-best-10" : "yakubun-click-best-10";
   }
 
   function loadBest(m) {
     try {
-      const value = Number(localStorage.getItem(bestKey(m)));
-      return Number.isFinite(value) && value > 0 ? value : null;
+      const v = Number(localStorage.getItem(bestKey(m)));
+      return Number.isFinite(v) && v > 0 ? v : null;
     } catch {
       return null;
     }
@@ -775,8 +771,8 @@
     if (timerFrame) cancelAnimationFrame(timerFrame);
     timerEl.textContent = formatTime(elapsedMs);
 
-    const oldBest = loadBest(mode);
-    const isBest = oldBest === null || elapsedMs < oldBest;
+    const old = loadBest(mode);
+    const isBest = old === null || elapsedMs < old;
     if (isBest) {
       try { localStorage.setItem(bestKey(mode), String(elapsedMs)); } catch {}
     }
@@ -789,15 +785,22 @@
     messageEl.textContent = text;
   }
 
+  function animateClass(el, cls, ms) {
+    el.classList.remove(cls);
+    void el.offsetWidth;
+    el.classList.add(cls);
+    setTimeout(() => el.classList.remove(cls), ms);
+  }
+
   function equation(text) {
     const el = document.createElement("div");
     el.className = "equation";
     el.textContent = text;
     game.append(el);
-    setTimeout(() => el.remove(), 950);
+    setTimeout(() => el.remove(), 850);
   }
 
-  function burst(count = 34) {
+  function burst(count = 30) {
     const host = document.createElement("div");
     host.className = "burst";
 
@@ -805,7 +808,7 @@
       const s = document.createElement("div");
       s.className = "spark";
       const angle = Math.random() * Math.PI * 2;
-      const dist = 80 + Math.random() * 180;
+      const dist = 70 + Math.random() * 160;
       s.style.setProperty("--x", Math.cos(angle) * dist + "px");
       s.style.setProperty("--y", Math.sin(angle) * dist + "px");
       s.style.setProperty("--r", (Math.random() * 720 - 360) + "deg");
@@ -814,20 +817,12 @@
     }
 
     target.append(host);
-    setTimeout(() => host.remove(), 900);
+    setTimeout(() => host.remove(), 850);
   }
 
-  function animateClass(el, cls, ms) {
-    el.classList.remove(cls);
-    void el.offsetWidth;
-    el.classList.add(cls);
-    setTimeout(() => el.classList.remove(cls), ms);
-  }
-
-  function renderMainValue() {
+  function renderValue() {
     if (mode === "divide") {
       numberEl.className = "";
-      numberEl.innerHTML = "";
       numberEl.textContent = n;
     } else {
       numberEl.className = "fraction";
@@ -840,92 +835,66 @@
   }
 
   function renderHistory() {
-    const values = mode === "divide" ? factors : reductions;
     historyBody.textContent = "";
 
-    if (!values.length) {
+    if (!pressedFactors.length) {
       historyBody.textContent = "まだなし";
       return;
     }
 
-    values.forEach((v, i) => {
+    pressedFactors.forEach((f, i) => {
       if (i) {
         const sep = document.createElement("span");
-        sep.className = "times";
+        sep.className = "sep";
         sep.textContent = mode === "divide" ? "×" : "→";
         historyBody.append(sep);
       }
 
       const chip = document.createElement("span");
-      chip.className = "factor-chip";
-      chip.textContent = mode === "divide" ? v : "÷" + v;
+      chip.className = "history-chip";
+      chip.textContent = mode === "divide" ? f : "÷" + f;
       historyBody.append(chip);
     });
   }
 
-  function makeDivideChoices(v) {
-    const pool = Array.from({length: 11}, (_, i) => i + 2).filter(x => x !== v);
-    let list = shuffle(pool).slice(0, 5);
+  function makeButtonValues() {
+    const correct = [...answerFactors];
 
-    if (!isPrime(v)) {
-      const ds = divisors(v).filter(x => x <= 12);
-      const usable = ds.length ? ds : divisors(v);
-      const correct = usable[Math.floor(Math.random() * usable.length)];
-      if (!list.some(x => x < v && v % x === 0)) {
-        list[Math.floor(Math.random() * list.length)] = correct;
+    // 最低6個、正解数の2倍を目安にし、タブレットで押しやすいよう最大10個。
+    const total = Math.min(10, Math.max(6, correct.length * 2));
+    const decoyCount = Math.max(0, total - correct.length);
+
+    // 外れは「いかにも割れそう」な小さめの数を優先する。
+    // 元の数（約分なら元の最大公約数）を割れない数だけを選べば、
+    // 途中の状態でも正解に変わることはない。
+    const base = mode === "divide"
+      ? originalN
+      : gcd(originalNum, originalDen);
+
+    let decoyPool = DECOY_POOL.filter(x => base % x !== 0);
+
+    // 問題によって候補が足りない場合だけ、少し大きな数まで広げる。
+    if (decoyPool.length < decoyCount) {
+      for (let x = 2; x <= 30; x++) {
+        if (base % x !== 0 && !decoyPool.includes(x)) decoyPool.push(x);
       }
     }
 
-    list = [...new Set(list)];
-    while (list.length < 5) {
-      const x = 2 + Math.floor(Math.random() * 11);
-      if (!list.includes(x) && x !== v) list.push(x);
-    }
-    return shuffle(list);
-  }
-
-  function makeReduceChoices(a, b) {
-    const pool = Array.from({length: 11}, (_, i) => i + 2);
-    let list = shuffle(pool).slice(0, 5);
-    const ds = commonDivisors(a, b);
-
-    if (ds.length) {
-      const usable = ds.filter(x => x <= 12);
-      const correctPool = usable.length ? usable : ds;
-      const correct = correctPool[Math.floor(Math.random() * correctPool.length)];
-      if (!list.some(x => a % x === 0 && b % x === 0)) {
-        list[Math.floor(Math.random() * list.length)] = correct;
-      }
-    }
-
-    list = [...new Set(list)];
-    while (list.length < 5) {
-      const x = 2 + Math.floor(Math.random() * 11);
-      if (!list.includes(x)) list.push(x);
-    }
-    return shuffle(list);
+    const decoys = shuffle(decoyPool).slice(0, decoyCount);
+    return shuffle([...correct, ...decoys]);
   }
 
   function renderChoices() {
     choicesEl.innerHTML = "";
-    const list = mode === "divide" ? makeDivideChoices(n) : makeReduceChoices(num, den);
 
-    list.forEach(value => {
-      const el = document.createElement("div");
-      el.className = "choice";
-      el.textContent = value;
-      el.setAttribute("role", "button");
-      el.setAttribute("tabindex", "0");
-      attachDrag(el, value);
-
-      el.addEventListener("keydown", e => {
-        if ((e.key === "Enter" || e.key === " ") && gameStarted && !locked) {
-          e.preventDefault();
-          tryValue(value);
-        }
-      });
-
-      choicesEl.append(el);
+    makeButtonValues().forEach((value, index) => {
+      const button = document.createElement("button");
+      button.className = "choice";
+      button.textContent = value;
+      button.dataset.value = value;
+      button.dataset.index = index;
+      button.addEventListener("click", () => pressChoice(button, value));
+      choicesEl.append(button);
     });
 
     const giveup = document.createElement("button");
@@ -935,182 +904,77 @@
     choicesEl.append(giveup);
   }
 
-  function refreshChoices() {
-    renderChoices();
-    choicesEl.classList.remove("refresh");
-    void choicesEl.offsetWidth;
-    choicesEl.classList.add("refresh");
+  function remainingCount(value) {
+    const need = answerFactors.filter(x => x === value).length;
+    const used = pressedFactors.filter(x => x === value).length;
+    return need - used;
   }
 
-  function attachDrag(el, value) {
-    let dragging = false;
-    let pointerId = null;
-    let offsetX = 0;
-    let offsetY = 0;
-    let homeRect = null;
+  function pressChoice(button, value) {
+    if (!gameStarted || locked || button.disabled) return;
 
-    el.addEventListener("pointerdown", e => {
-      if (locked || !gameStarted) return;
-      dragging = true;
-      pointerId = e.pointerId;
-      homeRect = el.getBoundingClientRect();
-      offsetX = e.clientX - homeRect.left;
-      offsetY = e.clientY - homeRect.top;
-
-      el.setPointerCapture(pointerId);
-      el.style.width = homeRect.width + "px";
-      el.style.height = homeRect.height + "px";
-      el.style.left = homeRect.left + "px";
-      el.style.top = homeRect.top + "px";
-      el.classList.add("dragging");
-      move(e);
-
-      if (navigator.vibrate) navigator.vibrate(10);
-    });
-
-    el.addEventListener("pointermove", e => {
-      if (!dragging || e.pointerId !== pointerId) return;
-      move(e);
-      const r = target.getBoundingClientRect();
-      const inside =
-        e.clientX >= r.left && e.clientX <= r.right &&
-        e.clientY >= r.top && e.clientY <= r.bottom;
-      target.classList.toggle("ready", inside);
-    });
-
-    el.addEventListener("pointerup", e => finish(e, false));
-    el.addEventListener("pointercancel", e => finish(e, true));
-
-    function move(e) {
-      el.style.left = (e.clientX - offsetX) + "px";
-      el.style.top = (e.clientY - offsetY) + "px";
+    if (remainingCount(value) <= 0) {
+      animateClass(button, "wrong", 420);
+      showMessage(`${value} はちがうよ`, "bad");
+      setTimeout(() => { if (!locked) showMessage(""); }, 650);
+      return;
     }
 
-    function finish(e, cancelled) {
-      if (!dragging || e.pointerId !== pointerId) return;
-      dragging = false;
-      target.classList.remove("ready");
-
-      const r = target.getBoundingClientRect();
-      const dropped =
-        !cancelled &&
-        e.clientX >= r.left && e.clientX <= r.right &&
-        e.clientY >= r.top && e.clientY <= r.bottom;
-
-      el.classList.remove("dragging");
-      el.style.cssText = "";
-
-      if (dropped) tryValue(value);
-    }
-  }
-
-  function tryValue(x) {
-    if (locked || !gameStarted) return;
+    button.disabled = true;
+    button.classList.add("used");
+    pressedFactors.push(value);
+    renderHistory();
 
     if (mode === "divide") {
-      if (x < n && n % x === 0) {
-        locked = true;
-
-        const old = n;
-        const next = n / x;
-        n = next;
-        factors.push(x);
-
-        renderHistory();
-
-        // 古い候補を誤って押せないよう、下を先に更新する。
-        refreshChoices();
-        showMessage("やった！ われた！", "good");
-
-        setTimeout(() => {
-          equation(`${old} ÷ ${x} = ${next}`);
-          renderMainValue();
-          burst();
-          animateClass(target, "success-pop", 600);
-        }, 120);
-
-        setTimeout(() => {
-          showMessage("");
-          locked = false;
-        }, 520);
-      } else {
-        equation(`${n} ÷ ${x} … われない！`);
-        showMessage(`${x} では われないよ`, "bad");
-        animateClass(target, "wrong-flash", 500);
-        animateClass(numberEl, "shake", 500);
-        setTimeout(() => { if (!locked) showMessage(""); }, 800);
-      }
+      const old = n;
+      n /= value;
+      equation(`${old} ÷ ${value} = ${n}`);
+      renderValue();
+      showMessage("せいかい！", "good");
     } else {
-      if (num % x === 0 && den % x === 0) {
-        locked = true;
-
-        const oldNum = num;
-        const oldDen = den;
-        num /= x;
-        den /= x;
-        reductions.push(x);
-
-        renderHistory();
-
-        // 約分ゲームでも候補を先に更新する。
-        refreshChoices();
-        showMessage("やった！ 約分できた！", "good");
-
-        setTimeout(() => {
-          equation(`${oldNum}/${oldDen} ÷ ${x} = ${num}/${den}`);
-          renderMainValue();
-          burst();
-          animateClass(target, "success-pop", 600);
-        }, 120);
-
-        setTimeout(() => {
-          showMessage("");
-          locked = false;
-        }, 520);
-      } else {
-        equation(`${x} では両方われない！`);
-        showMessage(`${x} では約分できないよ`, "bad");
-        animateClass(target, "wrong-flash", 500);
-        animateClass(numberEl, "shake", 500);
-        setTimeout(() => { if (!locked) showMessage(""); }, 800);
-      }
+      const oldNum = num;
+      const oldDen = den;
+      num /= value;
+      den /= value;
+      equation(`${oldNum}/${oldDen} ÷ ${value} = ${num}/${den}`);
+      renderValue();
+      showMessage("約分できた！", "good");
     }
+
+    burst(22);
+    animateClass(target, "success-pop", 520);
+
+    setTimeout(() => {
+      if (!locked) showMessage("");
+    }, 500);
+  }
+
+  function allCorrectPressed() {
+    return pressedFactors.length === answerFactors.length;
   }
 
   function giveUp() {
-    if (locked || !gameStarted) return;
+    if (!gameStarted || locked) return;
 
-    const finished =
-      mode === "divide"
-        ? isPrime(n)
-        : gcd(num, den) === 1;
-
-    if (!finished) {
+    if (!allCorrectPressed()) {
       showMessage(
         mode === "divide"
-          ? "まだわれるよ！ もういちど探してみよう"
-          : "まだ約分できるよ！ もういちど探してみよう",
+          ? "まだ押せる正しい数字があるよ！"
+          : "まだ約分に使える数字があるよ！",
         "bad"
       );
-      animateClass(numberEl, "shake", 500);
-      setTimeout(() => {
-        if (!locked) {
-          showMessage("");
-          refreshChoices();
-        }
-      }, 900);
+      animateClass(numberEl, "shake", 450);
+      setTimeout(() => { if (!locked) showMessage(""); }, 800);
       return;
     }
 
     locked = true;
-    choicesEl.innerHTML = "";
-    burst(70);
-    animateClass(target, "success-pop", 700);
+    choicesEl.querySelectorAll("button").forEach(b => b.disabled = true);
+    burst(55);
+    animateClass(target, "success-pop", 650);
 
     if (mode === "divide") {
-      factors.push(n);
-      renderHistory();
-      equation(`${originalN} = ${factors.join(" × ")}`);
+      equation(`${originalN} = ${answerFactors.join(" × ")}`);
     } else {
       equation(`${originalNum}/${originalDen} → ${num}/${den}`);
     }
@@ -1125,13 +989,8 @@
       );
       endButtons.classList.add("show");
     } else {
-      showMessage(
-        mode === "divide"
-          ? `せいかい！ ${n} はこれ以上われない！`
-          : `せいかい！ ${num}/${den} はもう約分できない！`,
-        "good"
-      );
-      setTimeout(() => newRound(false), 700);
+      showMessage("せいかい！ もうムリ！", "good");
+      setTimeout(() => newRound(false), 650);
     }
   }
 
@@ -1156,16 +1015,16 @@
   function configureModeUI() {
     if (mode === "divide") {
       gameTitle.textContent = "われるかな？";
-      gameHelp.textContent = "下の数字を、上の数字にドラッグしよう！";
-      promptEl.textContent = "この数字をわってみよう";
-      footerEl.textContent = "われなくなったと思ったら「もうムリ」を押してね";
-      historyLabel.textContent = "とった数字：";
+      gameHelp.textContent = "正しい数字をぜんぶ押そう！";
+      promptEl.textContent = "この数字を 1 になるまでわろう";
+      footerEl.textContent = "正しいボタンをぜんぶ押したら「もうムリ」！";
+      historyLabel.textContent = "おした数字：";
     } else {
       gameTitle.textContent = "なにで約分できるかな？";
-      gameHelp.textContent = "下の数字を、分数にドラッグしよう！";
-      promptEl.textContent = "分子と分母を、同じ数でわってみよう";
-      footerEl.textContent = "もう約分できないと思ったら「もうムリ」を押してね";
-      historyLabel.textContent = "約分した数：";
+      gameHelp.textContent = "約分に使える数字をぜんぶ押そう！";
+      promptEl.textContent = "分子と分母を同じ数でわろう";
+      footerEl.textContent = "これ以上約分できなくなったら「もうムリ」！";
+      historyLabel.textContent = "約分した数字：";
     }
     refreshBestDisplays();
   }
@@ -1174,24 +1033,25 @@
     locked = false;
     target.classList.remove("winner");
     endButtons.classList.remove("show");
+    pressedFactors = [];
 
     if (first) round = 1;
     else round++;
 
     if (mode === "divide") {
-      factors = [];
       originalN = pickDivideProblem(first);
       n = originalN;
+      answerFactors = primeFactors(originalN);
     } else {
-      reductions = [];
       [originalNum, originalDen] = pickReduceProblem(first);
       num = originalNum;
       den = originalDen;
+      answerFactors = primeFactors(gcd(originalNum, originalDen));
     }
 
     roundEl.textContent = `${round} / ${TOTAL_ROUNDS} 問`;
     showMessage("");
-    renderMainValue();
+    renderValue();
     renderHistory();
     renderChoices();
   }
@@ -1221,7 +1081,6 @@
   reduceModeBtn.addEventListener("click", () => startGame("reduce"));
 
   retryButton.addEventListener("click", () => {
-    const selected = mode;
     gameStarted = true;
     configureModeUI();
     newRound(true);
